@@ -73,6 +73,14 @@ Workers consume jobs independently from the API server.
 
 The API responds immediately while the worker processes notifications in the background.
 
+### Job Processing Flow
+
+1. Client sends a notification request.
+2. API validates the payload with Zod.
+3. BullMQ adds the notification to Redis.
+4. Worker picks up the job.
+5. Worker processes the notification asynchronously.
+
 ## API Example
 
 Request:
