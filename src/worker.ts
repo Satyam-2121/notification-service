@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Worker } from "bullmq";
 import { connection } from "./queue";
 import { sendEmail } from "./services/email.service";

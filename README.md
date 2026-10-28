@@ -116,6 +116,17 @@ Start Redis:
 redis-server
 ```
 
+Create a `.env` file in the project root with the Gmail account and app
+password used to send notifications:
+
+```env
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+```
+
+The worker loads this file when it starts. Keep the credentials private;
+`.env` is excluded from Git.
+
 Start API:
 
 ```bash
