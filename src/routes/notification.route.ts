@@ -13,10 +13,17 @@ router.post("/", async (req, res) => {
     });
   }
 
-  await notificationQueue.add(
-    "send",
-    parsed.data
-  );
+  try {
+    await notificationQueue.add(
+      "send",
+      parsed.data
+    );
+  } catch (error) {
+    console.error("Failed to queue notification:", error);
+    return res.status(503).json({
+      error: "Notification service temporarily unavailable",
+    });
+  }
 
   return res.status(202).json({
     status: "queued",
