@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test -r ts-node/register tests/*.test.cjs"
+    "test": "node --test -r ts-node/register tests/*.test.cjs",
+    "test:integration": "node --test -r ts-node/register tests/*.integration.cjs"
   },
   "keywords": [],
   "author": "",

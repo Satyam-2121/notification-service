@@ -81,6 +81,11 @@ The API responds immediately while the worker processes notifications in the bac
 4. Worker picks up the job.
 5. Worker processes the notification asynchronously.
 
+Failed deliveries are retried up to two times after the initial attempt, with
+exponential backoff starting at one second. After three unsuccessful attempts,
+the job remains in the failed queue for inspection. Retries provide at-least-once
+delivery: an ambiguous SMTP failure can result in a duplicate email.
+
 ## API Example
 
 Request:
@@ -139,6 +144,13 @@ Start Worker:
 npx ts-node-dev src/worker.ts
 ```
 
+## Tests
+
+Run validation tests with `npm test` and TypeScript checks with `npx tsc --noEmit`.
+Run `npm run test:integration` to verify delivery retries against a temporary,
+isolated Redis server. The integration tests require `redis-server` on your PATH,
+start and stop it automatically, and do not send real emails.
+
 ## What I Learned
 
 * How message queues work
@@ -151,7 +163,6 @@ npx ts-node-dev src/worker.ts
 ## Future Improvements
 
 * Email delivery using Nodemailer
-* Retry mechanism
 * Dead Letter Queue (DLQ)
 * PostgreSQL integration
 * SMS notifications
