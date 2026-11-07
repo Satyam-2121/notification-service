@@ -138,6 +138,10 @@ Start API:
 npx ts-node-dev src/app.ts
 ```
 
+The API listens on port 3000 by default. Set the `PORT` environment variable
+when your hosting platform assigns a different port, for example
+`PORT=8080 npx ts-node-dev src/app.ts`.
+
 Start Worker:
 
 ```bash
