@@ -73,6 +73,11 @@ test("delivers a notification after transient delivery failures", async () => {
   assert.equal(attempts.get(job.id), 3);
 });
 
+test("the production queue handles connection error events", () => {
+  assert.ok(queue.listenerCount("error") > 0);
+  assert.doesNotThrow(() => queue.emit("error", new Error("Redis unavailable")));
+});
+
 test("stops retrying a persistent failure after three attempts", async () => {
   const job = await queue.add("send", { failures: 10 });
   await assert.rejects(job.waitUntilFinished(events, 10000), /Temporary SMTP failure/);

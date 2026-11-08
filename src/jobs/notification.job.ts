@@ -11,3 +11,8 @@ export const notificationQueue = new Queue("notifications", {
     },
   },
 });
+
+// Queue connection errors are emitted independently of individual jobs.
+notificationQueue.on("error", (error) => {
+  console.error("Notification queue connection error:", error.message);
+});
