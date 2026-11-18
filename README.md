@@ -129,8 +129,10 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 ```
 
-The worker loads this file when it starts. Keep the credentials private;
-`.env` is excluded from Git.
+The worker loads this file when it starts. Keep the credentials private.
+`.env` is excluded from Git. The API and worker connect to Redis at
+`127.0.0.1:6379` by default. Set `REDIS_HOST` and `REDIS_PORT` in the
+environment or in `.env` to use a different address.
 
 Start API:
 

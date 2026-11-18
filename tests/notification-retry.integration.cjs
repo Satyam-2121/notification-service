@@ -42,8 +42,10 @@ before(async () => {
   });
 
   // Point the production queue at an isolated Redis before importing it.
+  process.env.REDIS_HOST = "127.0.0.1";
+  process.env.REDIS_PORT = String(port);
   const { connection } = require("../src/queue");
-  connection.port = port;
+  assert.equal(connection.port, port);
   queue = require("../src/jobs/notification.job").notificationQueue;
   events = new QueueEvents("notifications", { connection });
   worker = new Worker("notifications", async (job) => {
