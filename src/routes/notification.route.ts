@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { NotificationSchema } from "../schemas/notification.schema";
-import { notificationQueue } from "../jobs/notification.job";
+import { enqueueNotification } from "../jobs/notification.job";
 
 const router = Router();
 
@@ -14,10 +14,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    await notificationQueue.add(
-      "send",
-      parsed.data
-    );
+    await enqueueNotification(parsed.data);
   } catch (error) {
     console.error("Failed to queue notification:", error);
     return res.status(503).json({

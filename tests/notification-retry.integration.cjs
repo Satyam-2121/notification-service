@@ -21,6 +21,19 @@ before(async () => {
   await once(socket, "listening");
   const port = socket.address().port;
   await new Promise((resolve, reject) => socket.close((error) => error ? reject(error) : resolve()));
+
+  // Load the producer before starting its configured Redis instance.
+  process.env.REDIS_HOST = "127.0.0.1";
+  process.env.REDIS_PORT = String(port);
+  const { connection } = require("../src/queue");
+  assert.equal(connection.port, port);
+  const { notificationQueue, enqueueNotification } = require("../src/jobs/notification.job");
+  queue = notificationQueue;
+  await assert.rejects(
+    enqueueNotification({ type: "email", to: "test@example.com", subject: "Test", message: "Test" }),
+    /queue is not ready/,
+  );
+
   directory = await mkdtemp(path.join(tmpdir(), "notification-retry-"));
   redis = spawn("redis-server", [
     "--bind", "127.0.0.1", "--port", String(port),
@@ -41,12 +54,6 @@ before(async () => {
     });
   });
 
-  // Point the production queue at an isolated Redis before importing it.
-  process.env.REDIS_HOST = "127.0.0.1";
-  process.env.REDIS_PORT = String(port);
-  const { connection } = require("../src/queue");
-  assert.equal(connection.port, port);
-  queue = require("../src/jobs/notification.job").notificationQueue;
   events = new QueueEvents("notifications", { connection });
   worker = new Worker("notifications", async (job) => {
     const count = (attempts.get(job.id) || 0) + 1;
@@ -55,6 +62,9 @@ before(async () => {
     return "delivered";
   }, { connection });
   await Promise.all([queue.waitUntilReady(), events.waitUntilReady(), worker.waitUntilReady()]);
+
+  const job = await enqueueNotification({ type: "email", to: "test@example.com", subject: "Test", message: "Test" });
+  assert.equal(await job.waitUntilFinished(events, 10000), "delivered");
 });
 
 after(async () => {
