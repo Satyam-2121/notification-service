@@ -81,9 +81,10 @@ The API responds immediately while the worker processes notifications in the bac
 4. Worker picks up the job.
 5. Worker processes the notification asynchronously.
 
-Failed deliveries are retried up to two times after the initial attempt, with
+Transient delivery failures are retried up to two times after the initial attempt, with
 exponential backoff starting at one second. After three unsuccessful attempts,
-the job remains in the failed queue for inspection. Retries provide at-least-once
+the job remains in the failed queue for inspection. A permanent SMTP rejection
+(a 5xx reply) moves the job directly to the failed queue. Retries provide at-least-once
 delivery: an ambiguous SMTP failure can result in a duplicate email.
 
 ## API Example

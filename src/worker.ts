@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Worker } from "bullmq";
+import { UnrecoverableError, Worker } from "bullmq";
 import { connection } from "./queue";
 import { sendEmail } from "./services/email.service";
 
@@ -8,11 +8,20 @@ const worker = new Worker(
   async (job) => {
     const { to, subject, message } = job.data;
 
-    await sendEmail(
-      to,
-      subject,
-      message
-    );
+    try {
+      await sendEmail(to, subject, message);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        "responseCode" in error &&
+        typeof error.responseCode === "number" &&
+        error.responseCode >= 500 &&
+        error.responseCode < 600
+      ) {
+        throw new UnrecoverableError(error.message);
+      }
+      throw error;
+    }
 
     console.log(
       `Email sent to ${to}`
