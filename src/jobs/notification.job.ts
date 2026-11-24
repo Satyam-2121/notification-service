@@ -38,3 +38,10 @@ export async function enqueueNotification(notification: NotificationInput) {
   }
   return notificationQueue.add("send", notification);
 }
+
+export async function isNotificationQueueReady() {
+  if (!initialized) return false;
+
+  const client = await notificationQueue.client;
+  return client.status === "ready";
+}

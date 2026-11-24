@@ -145,6 +145,10 @@ The API listens on port 3000 by default. Set the `PORT` environment variable
 when your hosting platform assigns a different port, for example
 `PORT=8080 npx ts-node-dev src/app.ts`.
 
+`GET /` reports that the API is running. Use `GET /ready` to check
+whether the notification queue is connected to Redis. It returns HTTP
+503 while the queue is initializing or reconnecting.
+
 Start Worker:
 
 ```bash

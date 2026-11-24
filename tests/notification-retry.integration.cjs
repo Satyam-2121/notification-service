@@ -27,8 +27,9 @@ before(async () => {
   process.env.REDIS_PORT = String(port);
   const { connection } = require("../src/queue");
   assert.equal(connection.port, port);
-  const { notificationQueue, enqueueNotification } = require("../src/jobs/notification.job");
+  const { notificationQueue, enqueueNotification, isNotificationQueueReady } = require("../src/jobs/notification.job");
   queue = notificationQueue;
+  assert.equal(await isNotificationQueueReady(), false);
   await assert.rejects(
     enqueueNotification({ type: "email", to: "test@example.com", subject: "Test", message: "Test" }),
     /queue is not ready/,
@@ -62,6 +63,7 @@ before(async () => {
     return "delivered";
   }, { connection });
   await Promise.all([queue.waitUntilReady(), events.waitUntilReady(), worker.waitUntilReady()]);
+  assert.equal(await isNotificationQueueReady(), true);
 
   const job = await enqueueNotification({ type: "email", to: "test@example.com", subject: "Test", message: "Test" });
   assert.equal(await job.waitUntilFinished(events, 10000), "delivered");
