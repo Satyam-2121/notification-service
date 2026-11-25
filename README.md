@@ -104,7 +104,8 @@ Response:
 
 ```json
 {
-  "status": "queued"
+  "status": "queued",
+  "jobId": "42"
 }
 ```
 

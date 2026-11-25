@@ -14,17 +14,17 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    await enqueueNotification(parsed.data);
+    const job = await enqueueNotification(parsed.data);
+    return res.status(202).json({
+      status: "queued",
+      jobId: job.id,
+    });
   } catch (error) {
     console.error("Failed to queue notification:", error);
     return res.status(503).json({
       error: "Notification service temporarily unavailable",
     });
   }
-
-  return res.status(202).json({
-    status: "queued",
-  });
 });
 
 export default router;
